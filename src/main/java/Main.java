@@ -1,27 +1,22 @@
 import java.io.*;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class Main {
 
-    public static void Counter(String fileContents) {
+    // Creating an HashMap
+    static Map<Character, Integer> characterHashMap = new TreeMap<Character, Integer>();
 
-        // Creating an HashMap
-        HashMap<Character, Integer> characterHashMap = new HashMap<Character, Integer>();
+    public static void Counter(char character) {
 
-        char[] characters = fileContents.toCharArray();  // cast the file contents to an array of characters
-
-        for (char character : characters) {
-            if (characterHashMap.containsKey(character)) {
-                // increment the character at index if it already exist by 1
-                characterHashMap.put(character, characterHashMap.get(character)+1);
-            } else {
-                // add the new character with value 1
-                characterHashMap.put(character, 1);
-            }
+        if (characterHashMap.containsKey(character)) {
+            // increment the character at index if it already exist by 1
+            characterHashMap.put(character, characterHashMap.get(character)+1);
+        } else {
+            // add the new character with value 1
+            characterHashMap.put(character, 1);
         }
-
-        System.out.print(characterHashMap);
-
     }
 
     public static void MyFileReader() {
@@ -31,21 +26,29 @@ public class Main {
             File currentDir = new File (".");
             String basePath = currentDir.getCanonicalPath();
 
-            InputStream iStream = new BufferedInputStream(
-                    new FileInputStream(basePath + "/sample_file/sample.txt"));
-            byte[] contents = new byte[1024];
+            Reader reader = new FileReader(basePath + "/sample_file/sample.txt");
 
-            int bytesRead = 0;  // will hold the number of bytes read
-            String fileContents = ""; // will hold the file contents that will be passed to the counter method
+            char[] contents = new char[1024];
+            int read = 0;  // will hold the number of bytes read
 
             // will return 0 when their are no more bytes
-            while (iStream.available() > 0) {
-                bytesRead = iStream.read(contents);  //
-                fileContents += new String(contents, 0, bytesRead);  // casting the bytesRead to string
-            }
+            while ((read = reader.read(contents)) != -1) {
 
-            // referencing the Counter function and passing the fileContents as argument
-            Counter(fileContents);
+                for(int i = 0; i < read; i++){
+
+                    char c = contents[i];
+
+                    // check for only uppercase and lower case alphabets
+                    if((c >= 65 && c <= 90) || (c >= 97 && c <= 122)) {
+
+                        // check for all uppercase and convert to lower case
+                        if(c <= 90) {
+                            c += 32;
+                        }
+                        Counter(c);  // reference the counter method
+                    }
+                }
+            }
 
         } catch (FileNotFoundException e) {
             return;
@@ -56,6 +59,7 @@ public class Main {
 
     public static void main(String[] args) {
         MyFileReader();
+        System.out.print(characterHashMap);
     }
 
 }
